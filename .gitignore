@@ -1,3 +1,13 @@
+# private
+.directory
+nnUNet_preprocessed
+nnUNet_raw
+nnUNet_results
+kagglecookies.txt
+fabi.txt
+*.nrrd
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

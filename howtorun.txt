@@ -1,0 +1,56 @@
+#in case data unzipping is needed again:
+#zip -FF 1-200.zip --out 1-200_full.zip
+#unzip {z_full} -d {TARGET_DIR}
+#
+#to download from pages with psws, directly:
+#wget -x --load-cookies kagglecookies.txt https://www.kaggle.com/datasets/xiaoweixumedicalai/imagecas/download?datasetVersionNumber=3
+
+
+
+/opt/conda/bin/conda create --prefix ~/.conda/envs/kranskarl -y
+/opt/conda/bin/conda install --prefix ~/.conda/envs/kranskarl -c anaconda ipykernel -y
+~/.conda/envs/kranskarl/bin/python -m ipykernel install --user --name=kranskarl
+# potentially these two if activate doesnt work:
+/opt/conda/bin/conda init
+source /home/maia-user/.bashrc 
+#
+conda activate /home/maia-user/.conda/envs/kranskarl
+
+
+#if stuff craches and your conda env disappears, you can recreate from yml
+conda env export > kranskarl.yml #to create yml
+conda env create -f kranskarl.yml #to recreate env
+# alternatively, you can just create your env inside your home folder so it will persist across session. 
+# Just use this flag when you create the conda env: 
+conda env create --prefix ~/.conda/envs/<ENV_NAME> --file <ENV_YML_FILE> -y
+
+conda install numpy scipy scikit-image scikit-learn pandas matplotlib seaborn pynrrd nibabel -c conda-forge
+conda install pytorch-gpu torchvision torchaudio pytorch-cuda -c nvidia -c pytorch
+#Mogoce bos rabla se pytorch::torchtriton
+
+#for the nnunet:
+cd ~
+git clone https://github.com/MIC-DKFZ/nnUNet.git
+cd nnUNet
+pip install -e .
+cd ../Desktop
+
+################# hopefully everything above remains done. so next time just need to do this below:
+source .bashrc
+conda activate kranskarl
+#######################
+
+# and finally, for running:
+export nnUNet_raw="/home/maia-user/Desktop/nnUNet_raw"
+export nnUNet_preprocessed="/home/maia-user/Desktop/nnUNet_preprocessed"
+export nnUNet_results="/home/maia-user/Desktop/nnUNet_results"
+
+# to limit the memory usage
+export nnUNet_n_proc_DA=4 
+
+nnUNetv2_plan_and_preprocess -d 666 --verify_dataset_integrity
+nnUNetv2_train DATASET_NAME_OR_ID 3d_fullres FOLD [--npz]
+#Then find best config or run an ensemble, apply even postprocessing. (Which probably just removes all CCs but the largest...)
+
+# When you need to continue running (--c), or use different plans (-p):
+nnUNetv2_train 666 3d_fullres 1 -tr nnUNetTrainer_300epochs -p nnUNetResEncUNetMPlans --npz --c
