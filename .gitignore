@@ -6,7 +6,7 @@ nnUNet_results
 kagglecookies.txt
 fabi.txt
 *.nrrd
-
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
